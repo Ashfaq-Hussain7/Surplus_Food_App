@@ -22,7 +22,7 @@ router.get('/profile', auth, async (req, res) => {
 });
 
 router.get('/dashboard', auth, getDashboard);
-router.post('/claim/:donationId', auth, claimDonation);
+router.post('/claim/:id', auth, claimDonation);
 router.post('/search', auth, searchDonations);
 
 
