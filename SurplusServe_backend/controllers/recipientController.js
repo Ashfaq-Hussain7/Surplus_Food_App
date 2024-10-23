@@ -1,5 +1,8 @@
 import User from '../models/User.js';
 import Donation from '../models/Donation.js';
+import qr from 'qrcode';
+import { v4 as uuidv4 } from 'uuid';
+import mongoose from 'mongoose';
 
 
 const handleError = (res, error, message = 'Server error') => {
@@ -135,21 +138,76 @@ export const getDashboard = async (req, res) => {
 
 export const claimDonation = async (req, res) => {
     try{
+
+        console.log('Attempting to claim donation with ID:', req.params.id);
+        
+        // Validate MongoDB ObjectId format
+        if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
+            console.log('Invalid donation ID format:', req.params.id);
+            return res.status(400).json({ 
+                message: 'Invalid donation ID format',
+                providedId: req.params.id 
+            });
+        }
+
         const donation = await Donation.findById(req.params.id);
 
         if (!donation) {
-            return res.status(404).json({ message: 'Donation not found' });
+            console.log('Donation not found with ID:', req.params.id);
+            return res.status(404).json({ 
+                message: 'Donation not found',
+                providedId: req.params.id
+            });
         }
 
+        // Check donation status
         if (donation.status !== 'available') {
-            return res.status(400).json({ message: 'Donation already claimed' });
+            console.log('Donation already claimed:', donation.status);
+            return res.status(400).json({ 
+                message: 'Donation already claimed',
+                currentStatus: donation.status
+            });
+        }
+
+        // Verify user exists in request
+        if (!req.user || !req.user.id) {
+            console.log('User not found in request');
+            return res.status(401).json({ 
+                message: 'User not authenticated'
+            });
         }
 
         donation.status = 'claimed';
         donation.recipient = req.user._id;
         await donation.save();
 
-        res.json({ message: 'Donation claimed successfully', donation });
+        //Genereate reciept details
+        const recieptId = uuidv4();
+        const recieptData = {
+            recieptId,
+            donationId: donation._id,
+            itemName: donation.foodType,
+            quantity: donation.quantity,
+            donor: donation.donorId.organization,
+            recipient: req.user.name,
+            pickupLocation: donation.pickupLocation,
+            date: donation.createdAt
+        };           
+
+        //Generate QR code
+        const qrCode = await qr.toDataURL(JSON.stringify(recieptData));
+
+        //combine reciept data and qr code
+        const reciept = {
+            ...recieptData,
+            qrCode: qrCode
+        };
+
+        res.json({ 
+            message: 'Donation claimed successfully',
+            donation,
+            reciept
+        });
     } catch (error) {
         console.error("Error claiming donation :", error);
         res.status(500).json({ message: 'Server error' });
