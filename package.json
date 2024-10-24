@@ -1,6 +1,0 @@
-{
-  "dependencies": {
-    "qrcode": "^1.5.4",
-    "uuid": "^10.0.0"
-  }
-}
