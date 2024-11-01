@@ -120,12 +120,27 @@ export const getDonorDashboard = async (req, res) => {
 
         const totalDonations = donations.length;
         const totalQuantity = donations.reduce((sum, donation) => sum + donation.quantity, 0);
+
+        console.log('Total Donations:', totalDonations); // Debugging line
+        console.log('Total Quantity:', totalQuantity);   // Debugging line
+
         const recentDonations = donations.slice(0, 5);
+        const donationData = recentDonations.reduce((acc, donation) => {
+            const month = donation.date.toISOString().slice(0, 7); // Assuming date is a Date object
+            if (!acc[month]) {
+                acc[month] = { month, donations: 0 };
+            }
+            acc[month].donations += donation.quantity; // Sum the quantities for the month
+            return acc;
+        }, {});
+        
+        // Convert the accumulated object to an array
+        const formattedRecentDonations = Object.values(donationData);
 
         res.json({
             totalDonations,
             totalQuantity,
-            recentDonations
+            recentDonations: formattedRecentDonations
         });
     } catch (err) {
         console.error(err.message);
