@@ -16,17 +16,10 @@ import '../styles/DonorDash.css';
 
 const DonorDashboard = () => {
   const [showDonationForm, setShowDonationForm] = useState(false);
-  const [donationData, setDonationData] = useState([]);
+  // const [donationData, setDonationData] = useState([]);
   const [totalDonations, setTotalDonations] = useState(0);
   const [totalQuantity, setTotalQuantity] = useState(0);
-  // const [donationData, setDonationData] = useState([
-  //   { month: 'Jan', donations: 4 },
-  //   { month: 'Feb', donations: 7 },
-  //   { month: 'Mar', donations: 5 },
-  //   { month: 'Apr', donations: 8 },
-  //   { month: 'May', donations: 12 },
-  //   { month: 'Jun', donations: 9 },
-  // ]);
+  const [donationData, setDonationData] = useState([]);
   const fetchDonorData = async () => {
     try {
       const token = localStorage.getItem('token'); // Assuming you store the token in localStorage
@@ -181,29 +174,29 @@ const DonorDashboard = () => {
 
         {/* Donation History Chart */}
         <motion.div variants={itemVariants}>
-          <div className="bg-white p-4 rounded-lg shadow-md hover:shadow-lg transition-shadow duration-200">
-            <h3 className="text-sm font-medium">Donation History</h3>
-            <p className="text-xs text-gray-500">Your impact over time</p>
-            <div className="h-[300px] mt-4">
-              <ResponsiveContainer width="100%" height="100%">
-                <LineChart data={donationData}>
-                  <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis dataKey="month" />
-                  <YAxis />
-                  <Tooltip />
-                  <Line 
-                    type="monotone" 
-                    dataKey="donations" // Ensure this matches the data structure from the API
-                    stroke="#22c55e" 
-                    strokeWidth={2}
-                    dot={{ fill: '#22c55e', strokeWidth: 2 }}
-                    activeDot={{ r: 8 }}
-                  />
-                </LineChart>
-              </ResponsiveContainer>
+            <div className="bg-white p-4 rounded-lg shadow-md hover:shadow-lg transition-shadow duration-200">
+              <h3 className="text-sm font-medium">Donation History</h3>
+              <p className="text-xs text-gray-500">Food Saved</p>
+              <div className="h-[300px] mt-4">
+                <ResponsiveContainer width="100%" height="100%">
+                  <LineChart data={donationData}>
+                    <CartesianGrid strokeDasharray="3 3" />
+                    <XAxis dataKey="month" />
+                    <YAxis />
+                    <Tooltip />
+                    <Line 
+                      type="monotone" 
+                      dataKey="quantity" // Display quantity saved for each donation
+                      stroke="#22c55e" 
+                      strokeWidth={2}
+                      dot={{ fill: '#22c55e', strokeWidth: 2 }}
+                      activeDot={{ r: 8 }}
+                    />
+                  </LineChart>
+                </ResponsiveContainer>
+              </div>
             </div>
-          </div>
-        </motion.div>
+          </motion.div>
       </motion.div>
 
       {/* New Donation Form */}

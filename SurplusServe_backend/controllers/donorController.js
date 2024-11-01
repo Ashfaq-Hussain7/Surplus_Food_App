@@ -124,23 +124,17 @@ export const getDonorDashboard = async (req, res) => {
         console.log('Total Donations:', totalDonations); // Debugging line
         console.log('Total Quantity:', totalQuantity);   // Debugging line
 
-        const recentDonations = donations.slice(0, 5);
-        const donationData = recentDonations.reduce((acc, donation) => {
-            const month = donation.date.toISOString().slice(0, 7); // Assuming date is a Date object
-            if (!acc[month]) {
-                acc[month] = { month, donations: 0 };
-            }
-            acc[month].donations += donation.quantity; // Sum the quantities for the month
-            return acc;
-        }, {});
-        
-        // Convert the accumulated object to an array
-        const formattedRecentDonations = Object.values(donationData);
+        // const recentDonations = donations.slice(0, 5);
+        // Structure recentDonations to include date and quantity for frontend
+        const recentDonations = donations.slice(0, 5).map(donation => ({
+            month: new Date(donation.date).toLocaleString('default', { month: 'short' }),
+            quantity: donation.quantity
+        }));
 
         res.json({
             totalDonations,
             totalQuantity,
-            recentDonations: formattedRecentDonations
+            recentDonations
         });
     } catch (err) {
         console.error(err.message);
