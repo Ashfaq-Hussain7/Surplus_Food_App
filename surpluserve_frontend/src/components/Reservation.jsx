@@ -1,5 +1,6 @@
 import React from 'react';
 import { Phone, MapPin, Clock, CheckCircle } from 'lucide-react';
+import { motion } from 'framer-motion';
 import styles from '../styles/Reservation.css';
 
 const ModernReservation = () => {
@@ -25,33 +26,54 @@ const ModernReservation = () => {
   };
 
   return (
-    <div className={styles.container}>
-      <div className={styles.content}>
+    <motion.div 
+      className={styles.container}
+      initial={{ opacity: 0, scale: 0.95 }}
+      animate={{ opacity: 1, scale: 1 }}
+      transition={{ duration: 0.5 }}
+    >
+      <motion.div className={styles.content} animate={{ scale: [0.98, 1] }} transition={{ duration: 0.3 }}>
+        
         {/* Header */}
         <div className={styles.header}>
           <h1 className={styles.title}>Reservation Details</h1>
           <p className={styles.reservationId}>#{reservation.id}</p>
         </div>
 
-        {/* Status Card */}
-        <div className={styles.card}>
+        {/* Status Card with Framer Motion */}
+        <motion.div 
+          className={styles.card}
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 }}
+        >
           <div className={styles.cardHeader}>
             <h2 className={styles.cardTitle}>Status</h2>
-            <span className={`${styles.statusBadge} ${
-              reservation.status === "Confirmed" 
-                ? styles.statusConfirmed 
-                : styles.statusPending
-            }`}>
+            <motion.span
+              className={`${styles.statusBadge} ${
+                reservation.status === "Confirmed" 
+                  ? styles.statusConfirmed 
+                  : styles.statusPending
+              }`}
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ delay: 0.2 }}
+            >
               {reservation.status === "Confirmed" && (
                 <CheckCircle className={styles.statusIcon} />
               )}
               {reservation.status}
-            </span>
+            </motion.span>
           </div>
-        </div>
+        </motion.div>
 
         {/* Donor Information */}
-        <div className={styles.card}>
+        <motion.div 
+          className={styles.card}
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: 0.1 }}
+        >
           <h2 className={styles.cardTitle}>Donor Information</h2>
           <div className={styles.donorInfo}>
             <p className={styles.donorName}>{reservation.donor.name}</p>
@@ -67,10 +89,15 @@ const ModernReservation = () => {
               <p>{reservation.donor.instructions}</p>
             </div>
           </div>
-        </div>
+        </motion.div>
 
         {/* Pickup Details */}
-        <div className={styles.card}>
+        <motion.div 
+          className={styles.card}
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: 0.2 }}
+        >
           <h2 className={styles.cardTitle}>Pickup Details</h2>
           <div className={styles.pickupInfo}>
             <div className={styles.infoRow}>
@@ -81,10 +108,15 @@ const ModernReservation = () => {
               <p>Pickup window: {reservation.pickup.window}</p>
             </div>
           </div>
-        </div>
+        </motion.div>
 
         {/* Reserved Items */}
-        <div className={styles.card}>
+        <motion.div 
+          className={styles.card}
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: 0.3 }}
+        >
           <h2 className={styles.cardTitle}>Reserved Items</h2>
           <div className={styles.itemsList}>
             {reservation.items.map((item, index) => (
@@ -94,19 +126,24 @@ const ModernReservation = () => {
               </div>
             ))}
           </div>
-        </div>
+        </motion.div>
 
         {/* Action Buttons */}
-        <div className={styles.actions}>
+        <motion.div 
+          className={styles.actions}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.5, delay: 0.4 }}
+        >
           <button className={styles.cancelButton}>
             Cancel Reservation
           </button>
           <button className={styles.confirmButton}>
             Confirm Pickup
           </button>
-        </div>
-      </div>
-    </div>
+        </motion.div>
+      </motion.div>
+    </motion.div>
   );
 };
 

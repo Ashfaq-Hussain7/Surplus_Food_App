@@ -41,7 +41,7 @@
   
   .h-4, .w-4 {
     height: 1rem;
-    width: 1rem;
+    width: 1rem; 
   }
   
   .submit-button {
@@ -98,7 +98,7 @@
   .card-title {
     font-size: 1rem;
     font-weight: 500;
-    color: #4a5568;
+    color: #000000;
   }
   
   .card-content {
@@ -123,7 +123,7 @@
   }
   
   .text-muted-foreground {
-    color: #718096;
+    color: #000000;
   }
   
   /* Chart */
