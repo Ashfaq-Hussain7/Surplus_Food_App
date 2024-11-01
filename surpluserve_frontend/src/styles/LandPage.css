@@ -7,7 +7,7 @@ body {
 .hero-section {
   position: relative;
   height: 90vh;
-  background-image: url('C:/Users/ashfa/OneDrive/Desktop/Surplus_Food_App/surpluserve_frontend/src/assets/pic1.jpg'); /* Replace with your image */
+  background-image: url('../assets/pic1.jpg'); /* Replace with your image */
   background-size: cover;
   background-position: center;
   z-index: 1; /* Ensure the hero content is on top */

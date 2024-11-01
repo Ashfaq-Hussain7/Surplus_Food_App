@@ -1,3 +1,4 @@
+import axios from 'axios';
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Package, MapPin, Calendar, Clock, ArrowLeft } from 'lucide-react';
@@ -8,12 +9,14 @@ const NewDonation = ({ onClose }) => {
   const [formData, setFormData] = useState({
     foodType: '',
     quantity: '',
-    expiryDate: '',
-    pickupAddress: '',
+    expirationDate: '',
+    pickupLocation: '',
     pickupDate: '',
     pickupTime: '',
     notes: ''
   });
+
+  const [submissionSuccess, setSubmissionSuccess] = useState(false); // State for submission status
 
   const handleChange = (e) => {
     setFormData({
@@ -22,12 +25,59 @@ const NewDonation = ({ onClose }) => {
     });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    // Handle form submission logic here
-    console.log(formData);
-    onClose();
+    setSubmissionSuccess(false); // Reset submission status
+
+    try {
+      // Prepare data for the backend
+      const payload = {
+        foodType: formData.foodType,
+        quantity: formData.quantity,
+        expirationDate: formData.expirationDate,
+        pickupLocation: formData.pickupLocation,
+      };
+
+      const token = localStorage.getItem('token'); // Replace with your token retrieval logic
+
+      try {
+        const response = await axios.post('http://localhost:5001/api/donor/donate', payload, {
+          headers: {
+            'x-auth-token': token, // Use the same header name as in your middleware
+            'Content-Type': 'application/json'
+          }
+        });
+
+        // If the response is successful, set submissionSuccess to true
+        if (response.status === 201) {
+          setSubmissionSuccess(true);
+          
+          // Reset form data and step to 1 after submission
+          setFormData({
+            foodType: '',
+            quantity: '',
+            expirationDate: '',
+            pickupLocation: '',
+            pickupDate: '',
+            pickupTime: '',
+            notes: ''
+          });
+          setStep(1); // Reset step back to 1
+
+          // Hide the success message after 3 seconds
+          setTimeout(() => {
+            setSubmissionSuccess(false);
+          }, 3000);
+        }
+
+      } catch (error) {
+        console.error(error);
+      }
+    } catch (error) {
+      console.error(error);
+    }
   };
+
 
   const containerVariants = {
     hidden: { opacity: 0, x: '100%' },
@@ -124,8 +174,8 @@ const NewDonation = ({ onClose }) => {
               <label>Expiry Date</label>
               <input
                 type="date"
-                name="expiryDate"
-                value={formData.expiryDate}
+                name="expirationDate"
+                value={formData.expirationDate}
                 onChange={handleChange}
                 required
               />
@@ -142,8 +192,8 @@ const NewDonation = ({ onClose }) => {
               </label>
               <input
                 type="text"
-                name="pickupAddress"
-                value={formData.pickupAddress}
+                name="pickupLocation"
+                value={formData.pickupLocation}
                 onChange={handleChange}
                 placeholder="Enter pickup location"
                 required
@@ -180,53 +230,60 @@ const NewDonation = ({ onClose }) => {
           </motion.div>
         )}
 
-        {step === 3 && (
-          <motion.div className="form-step" variants={itemVariants}>
-            <div className="form-group">
-              <label>Additional Notes</label>
-              <textarea
-                name="notes"
-                value={formData.notes}
-                onChange={handleChange}
-                placeholder="Any special instructions or details?"
-                rows={4}
-              />
-            </div>
+      {step === 2 && (
+        <motion.div className="form-step" variants={itemVariants}>
+          <div className="form-group">
+            <label>Additional Notes</label>
+            <textarea
+              name="notes"
+              value={formData.notes}
+              onChange={handleChange}
+              placeholder="Any special instructions or details?"
+              rows={4}
+            />
+          </div>
 
-            <div className="donation-summary">
-              <h3>Donation Summary</h3>
-              <p><strong>Food Type:</strong> {formData.foodType}</p>
-              <p><strong>Quantity:</strong> {formData.quantity}kg</p>
-              <p><strong>Pickup:</strong> {formData.pickupDate} at {formData.pickupTime}</p>
-            </div>
-          </motion.div>
+          <div className="donation-summary">
+            <h3>Donation Summary</h3>
+            <p><strong>Food Type:</strong> {formData.foodType}</p>
+            <p><strong>Quantity:</strong> {formData.quantity}kg</p>
+            <p><strong>Pickup:</strong> {formData.pickupDate} at {formData.pickupTime}</p>
+          </div>
+        </motion.div>
+      )}
+
+      <div className="form-navigation">
+        {step > 1 && (
+          <button
+            type="button"
+            onClick={() => setStep(step - 1)}
+            className="secondary-button"
+          >
+            Previous
+          </button>
         )}
+        {step < 2 ? (
+          <button
+            type="button"
+            onClick={() => setStep(step + 1)}
+            className="primary-button"
+          >
+            Next
+          </button>
+        ) : (
+          <button type="submit" className="primary-button">
+            Submit Donation
+          </button>
+        )}
+      </div>
 
-        <div className="form-navigation">
-          {step > 1 && (
-            <button
-              type="button"
-              onClick={() => setStep(step - 1)}
-              className="secondary-button"
-            >
-              Previous
-            </button>
-          )}
-          {step < 3 ? (
-            <button
-              type="button"
-              onClick={() => setStep(step + 1)}
-              className="primary-button"
-            >
-              Next
-            </button>
-          ) : (
-            <button type="submit" className="primary-button">
-              Submit Donation
-            </button>
-          )}
-        </div>
       </motion.form>
+      {/* Display success message after submission */}
+      {submissionSuccess && (
+        <div className="success-message">
+          <p>Donation submitted successfully!</p>
+        </div>
+      )}
     </motion.div>
   );
 };
