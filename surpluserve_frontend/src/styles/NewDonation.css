@@ -162,3 +162,15 @@
       padding: 1.5rem;
     }
   }
+
+  /* Success message styling */
+.submission-success {
+  margin: 20px 0; /* Space above and below the message */
+  padding: 10px; /* Inner spacing */
+  background-color: #d4edda; /* Light green background */
+  color: #155724; /* Dark green text */
+  border: 1px solid #c3e6cb; /* Border color */
+  border-radius: 5px; /* Rounded corners */
+  text-align: center; /* Center the text */
+  font-weight: bold; /* Make the text bold */
+}

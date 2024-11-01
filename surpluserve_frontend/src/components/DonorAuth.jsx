@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom'; // Import useNavigate from React Router
 import { motion } from 'framer-motion';
+import axios from 'axios'; // Import axios for API calls
 import '../styles/Auth.css';
 
 const DonorAuth = () => {
@@ -8,24 +9,50 @@ const DonorAuth = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [name, setName] = useState('');
+  const [organization, setOrganization] = useState('');
+  const [phone, setPhone] = useState('');
+  // const [role] = useState('donor'); // Set role as 'donor'
+  const [error, setError] = useState(null);
   
   const navigate = useNavigate(); // Initialize useNavigate for redirection
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    
+
+    // Define the endpoint based on the action
+    const endpoint = isLogin ? '/api/auth/login' : '/api/auth/register';
+
+    const data = isLogin
+      ? { email, password }  // Data for login
+      : { email, password, role: 'donor', name, organization, phone }; // Data for signup
+
+      try {
+        const response = await axios.post(endpoint, data);
+  
+        if (response.data.token) {
+          // Save token to local storage
+          localStorage.setItem('token', response.data.token);
+  
+          // Navigate to donor dashboard
+          navigate('/donor-dashboard');
+        }
+      } catch (err) {
+        console.error(err);
+        setError(err.response?.data?.msg || 'An error occurred');
+      }
+
     // Mock login/signup logic (replace with your API call later)
-    if (email && password) {
-      console.log(isLogin ? 'Donor Login' : 'Donor Signup', { email, password, name });
+    // if (email && password) {
+    //   console.log(isLogin ? 'Donor Login' : 'Donor Signup', { email, password, name });
 
       // Simulate a successful login/signup (replace this logic as needed)
-      if (isLogin || (!isLogin && name)) {
-        // Navigate to the DonorDash page after successful login/signup
-        navigate('/donor-dashboard');
-      } else {
-        alert('Please enter all required fields.');
-      }
-    }
+    //   if (isLogin || (!isLogin && name)) {
+    //     // Navigate to the DonorDash page after successful login/signup
+    //     navigate('/donor-dashboard');
+    //   } else {
+    //     alert('Please enter all required fields.');
+    //   }
+    // }
   };
 
   return (
@@ -41,28 +68,63 @@ const DonorAuth = () => {
         </h2>
         
         <form onSubmit={handleSubmit} className="auth-form">
-          <motion.div
-            initial={{ opacity: 0, x: -20 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ delay: 0.2 }}
-          >
-            {!isLogin && (
-              <div className="form-group">
-                <label>Name</label>
-                <input
-                  type="text"
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                  required
-                />
-              </div>
-            )}
-          </motion.div>
+          {/* Name field for signup only */}
+          {!isLogin && (
+            <motion.div
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: 0.2 }}
+              className="form-group"
+            >
+              <label>Name</label>
+              <input
+                type="text"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                required
+              />
+            </motion.div>
+          )}
 
+          {/* Organization field for signup only */}
+          {!isLogin && (
+            <motion.div
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: 0.3 }}
+              className="form-group"
+            >
+              <label>Organization</label>
+              <input
+                type="text"
+                value={organization}
+                onChange={(e) => setOrganization(e.target.value)}
+              />
+            </motion.div>
+          )}
+
+          {/* Phone field for signup only */}
+          {!isLogin && (
+            <motion.div
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: 0.4 }}
+              className="form-group"
+            >
+              <label>Phone</label>
+              <input
+                type="text"
+                value={phone}
+                onChange={(e) => setPhone(e.target.value)}
+              />
+            </motion.div>
+          )}
+
+          {/* Email field */}
           <motion.div
             initial={{ opacity: 0, x: -20 }}
             animate={{ opacity: 1, x: 0 }}
-            transition={{ delay: 0.3 }}
+            transition={{ delay: 0.5 }}
             className="form-group"
           >
             <label>Email</label>
@@ -74,10 +136,11 @@ const DonorAuth = () => {
             />
           </motion.div>
 
+          {/* Password field */}
           <motion.div
             initial={{ opacity: 0, x: -20 }}
             animate={{ opacity: 1, x: 0 }}
-            transition={{ delay: 0.4 }}
+            transition={{ delay: 0.6 }}
             className="form-group"
           >
             <label>Password</label>
@@ -89,6 +152,10 @@ const DonorAuth = () => {
             />
           </motion.div>
 
+          {/* Error message display */}
+          {error && <p className="error-message">{error}</p>}
+
+          {/* Submit button */}
           <motion.button
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}

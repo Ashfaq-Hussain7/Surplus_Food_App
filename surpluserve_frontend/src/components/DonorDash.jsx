@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
+import axios from 'axios';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Calendar, Package, TrendingUp, Users, Plus } from 'lucide-react';
 import {
@@ -15,30 +16,72 @@ import '../styles/DonorDash.css';
 
 const DonorDashboard = () => {
   const [showDonationForm, setShowDonationForm] = useState(false);
-  const [donationData, setDonationData] = useState([
-    { month: 'Jan', donations: 4 },
-    { month: 'Feb', donations: 7 },
-    { month: 'Mar', donations: 5 },
-    { month: 'Apr', donations: 8 },
-    { month: 'May', donations: 12 },
-    { month: 'Jun', donations: 9 },
-  ]);
+  const [donationData, setDonationData] = useState([]);
+  const [totalDonations, setTotalDonations] = useState(0);
+  const [totalQuantity, setTotalQuantity] = useState(0);
+  // const [donationData, setDonationData] = useState([
+  //   { month: 'Jan', donations: 4 },
+  //   { month: 'Feb', donations: 7 },
+  //   { month: 'Mar', donations: 5 },
+  //   { month: 'Apr', donations: 8 },
+  //   { month: 'May', donations: 12 },
+  //   { month: 'Jun', donations: 9 },
+  // ]);
+  const fetchDonorData = async () => {
+    try {
+      const token = localStorage.getItem('token'); // Assuming you store the token in localStorage
+      const res = await axios.get('http://localhost:5001/api/donor/dashboard', {
+          headers: {
+              'x-auth-token': token // Use 'x-auth-token' here
+          }
+      });
+      const { totalDonations, totalQuantity, recentDonations } = res.data;
+      console.log('Fetched donation data:', recentDonations);
+      setDonationData(recentDonations);
+      setTotalDonations(totalDonations);
+      setTotalQuantity(totalQuantity);
+    } catch (error) {
+        console.error('Error fetching donor data:', error);
+    }
+  };
 
-  const handleNewDonation = (formData) => {
+  // Function to calculate the amount of food saved this week
+  const calculateSavedThisWeek = () => {
+    // Assuming donationData contains the necessary details for this calculation
+    const lastWeekTotal = donationData.reduce((sum, donation) => sum + donation.quantity, 0); // Update this based on your data structure
+    const currentTotal = totalQuantity; // Get the total quantity from state
+    return currentTotal - lastWeekTotal; // Calculate the difference
+  };
+
+  useEffect(() => {
+    fetchDonorData();
+  }, []);
+
+
+  const handleNewDonation = async (formData) => {
     // Here you would typically make an API call to save the donation
     // For now, we'll just update the local state
-    const currentMonth = new Date().toLocaleString('default', { month: 'short' });
-    const updatedData = [...donationData];
-    const currentMonthData = updatedData.find(d => d.month === currentMonth);
+  //   const currentMonth = new Date().toLocaleString('default', { month: 'short' });
+  //   const updatedData = [...donationData];
+  //   const currentMonthData = updatedData.find(d => d.month === currentMonth);
     
-    if (currentMonthData) {
-      currentMonthData.donations += 1;
-    } else {
-      updatedData.push({ month: currentMonth, donations: 1 });
+  //   if (currentMonthData) {
+  //     currentMonthData.donations += 1;
+  //   } else {
+  //     updatedData.push({ month: currentMonth, donations: 1 });
+  //   }
+    
+  //   setDonationData(updatedData);
+  //   setShowDonationForm(false);
+  // };
+
+    try {
+      await axios.post('http://localhost:5001/api/donor/donate', formData);
+      fetchDonorData();
+      setShowDonationForm(false);
+    } catch (error) {
+      console.error('Error submitting donation:', error);
     }
-    
-    setDonationData(updatedData);
-    setShowDonationForm(false);
   };
 
   const containerVariants = {
@@ -97,8 +140,8 @@ const DonorDashboard = () => {
                 <h3 className="text-sm font-medium">Total Donations</h3>
                 <Package className="h-4 w-4 text-gray-400" />
               </div>
-              <div className="text-2xl font-bold">45</div>
-              <p className="text-xs text-gray-500">+20.1% from last month</p>
+              <div className="text-2xl font-bold">{totalDonations}</div>
+              {/* <p className="text-xs text-gray-500">+20.1% from last month</p> */}
             </div>
           </motion.div>
 
@@ -119,12 +162,12 @@ const DonorDashboard = () => {
                 <h3 className="text-sm font-medium">Food Saved (kg)</h3>
                 <TrendingUp className="h-4 w-4 text-gray-400" />
               </div>
-              <div className="text-2xl font-bold">250</div>
-              <p className="text-xs text-gray-500">+43kg this week</p>
+              <div className="text-2xl font-bold">{totalQuantity}</div>
+              <p className="text-xs text-gray-500">+{calculateSavedThisWeek()}kg this week</p>
             </div>
           </motion.div>
 
-          <motion.div variants={itemVariants}>
+          {/* <motion.div variants={itemVariants}>
             <div className="bg-white p-4 rounded-lg shadow-md hover:shadow-lg transition-shadow duration-200">
               <div className="flex justify-between items-center">
                 <h3 className="text-sm font-medium">Next Pickup</h3>
@@ -133,10 +176,10 @@ const DonorDashboard = () => {
               <div className="text-2xl font-bold">2d 4h</div>
               <p className="text-xs text-gray-500">Thursday, 2:30 PM</p>
             </div>
-          </motion.div>
+          </motion.div> */}
         </motion.div>
 
-        {/* Chart */}
+        {/* Donation History Chart */}
         <motion.div variants={itemVariants}>
           <div className="bg-white p-4 rounded-lg shadow-md hover:shadow-lg transition-shadow duration-200">
             <h3 className="text-sm font-medium">Donation History</h3>
@@ -150,7 +193,7 @@ const DonorDashboard = () => {
                   <Tooltip />
                   <Line 
                     type="monotone" 
-                    dataKey="donations" 
+                    dataKey="donations" // Ensure this matches the data structure from the API
                     stroke="#22c55e" 
                     strokeWidth={2}
                     dot={{ fill: '#22c55e', strokeWidth: 2 }}
@@ -177,3 +220,5 @@ const DonorDashboard = () => {
 };
 
 export default DonorDashboard;
+
+
