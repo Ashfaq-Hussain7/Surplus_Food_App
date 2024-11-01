@@ -11,8 +11,6 @@ import DonorDashboard from './components/DonorDash';
 import RecipientDashboard from './components/RecipientDash';
 import ReservationPage from './components/Reservation';
 import NewDonation from './components/NewDonation';
-//import 'bootstrap/dist/css/bootstrap.min.css';
-
 
 function App() {
   return (
@@ -26,9 +24,9 @@ function App() {
         <Route path="/donor-auth" element={<DonorAuth />} />
         <Route path="/recipient-auth" element={<RecipientAuth />} />
         <Route path="/donor-dashboard" element={<DonorDashboard />} />
-        <Route path="/new-donations" element={<NewDonation/>} />
+        <Route path="/new-donations" element={<NewDonation />} />
         <Route path="/recipient-dashboard" element={<RecipientDashboard />} />
-        <Route path="/reservation" element={<ReservationPage />} />
+        <Route path="/reservation/:id" element={<ReservationPage />} /> {/* Updated route */}
       </Routes>
     </Router>
   );
