@@ -150,7 +150,9 @@ export const claimDonation = async (req, res) => {
             });
         }
 
-        const donation = await Donation.findById(req.params.id);
+        // const donation = await Donation.findById(req.params.id);
+        const donation = await Donation.findById(req.params.id)
+            .populate('donorId', 'organization');
 
         if (!donation) {
             console.log('Donation not found with ID:', req.params.id);
@@ -178,39 +180,105 @@ export const claimDonation = async (req, res) => {
         }
 
         donation.status = 'claimed';
-        donation.recipient = req.user._id;
+        donation.recipient = req.user.id;
         await donation.save();
 
         //Genereate reciept details
-        const recieptId = uuidv4();
-        const recieptData = {
-            recieptId,
+        const receiptId = uuidv4();
+        const receiptData = {
+            receiptId,
             donationId: donation._id,
             itemName: donation.foodType,
             quantity: donation.quantity,
             donor: donation.donorId.organization,
             recipient: req.user.name,
             pickupLocation: donation.pickupLocation,
-            date: donation.createdAt
+            // date: donation.createdAt
+            date: new Date(),
+            claimDate: new Date(),
+            expiryDate: donation.expiryDate,
+            status: 'CLAIMED'
         };           
 
         //Generate QR code
-        const qrCode = await qr.toDataURL(JSON.stringify(recieptData));
+        // const qrCode = await qr.toDataURL(JSON.stringify(recieptData));
 
-        //combine reciept data and qr code
-        const reciept = {
-            ...recieptData,
-            qrCode: qrCode
-        };
+        // //combine reciept data and qr code
+        // const reciept = {
+        //     ...recieptData,
+        //     qrCode: qrCode
+        // };
 
-        res.json({ 
-            message: 'Donation claimed successfully',
-            donation,
-            reciept
-        });
+        // res.json({ 
+        //     message: 'Donation claimed successfully',
+        //     donation,
+        //     reciept
+        // });
+        try {
+            // Generate QR code with essential pickup details
+            const qrCodeData = {
+                receiptId: receiptId,
+                donationId: donation._id.toString(),
+                pickupLocation: donation.pickupLocation
+            };
+            
+            const qrCode = await qr.toDataURL(JSON.stringify(qrCodeData));
+            
+            // Combine receipt data and qr code
+            const receipt = {
+                ...receiptData,
+                qrCode
+            };
+
+            res.json({ 
+                message: 'Donation claimed successfully',
+                donation,
+                receipt
+            });
+        } catch (qrError) {
+            console.error("Error generating QR code:", qrError);
+            
+            // Still send receipt without QR code if QR generation fails
+            res.json({ 
+                message: 'Donation claimed successfully (QR code generation failed)',
+                donation,
+                receipt: receiptData
+            });
+        }
     } catch (error) {
         console.error("Error claiming donation :", error);
         res.status(500).json({ message: 'Server error' });
+    }
+};
+
+export const getDonationById = async (req, res) => {
+    try {
+        // Validate MongoDB ObjectId format
+        if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
+            return res.status(400).json({ 
+                message: 'Invalid donation ID format',
+                providedId: req.params.id 
+            });
+        }
+
+        // Find donation and populate donor details
+        const donation = await Donation.findById(req.params.id)
+            .populate('donorId', 'organization') // Populate donor info, excluding donor's _id
+            .select('-__v'); // Exclude version key
+
+        if (!donation) {
+            return res.status(404).json({ 
+                message: 'Donation not found',
+                providedId: req.params.id
+            });
+        }
+
+        // Return donation details
+        res.json(donation);
+
+    } catch (error) {
+        console.error("Error fetching donation details:", error);
+        res.status(500).json({ message: 'Server error while fetching donation details' });
     }
 };
 

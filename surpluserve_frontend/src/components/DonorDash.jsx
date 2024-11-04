@@ -13,6 +13,7 @@ import {
 } from 'recharts';
 import NewDonation from './NewDonation';
 import '../styles/DonorDash.css';
+import { formatDate } from '../utils';
 
 const DonorDashboard = () => {
   const [showDonationForm, setShowDonationForm] = useState(false);
@@ -29,8 +30,12 @@ const DonorDashboard = () => {
           }
       });
       const { totalDonations, totalQuantity, recentDonations } = res.data;
+      const formattedDonations = recentDonations.map(donation => ({
+        ...donation,
+        month: formatDate(donation.createdAt)  // Assuming you want to format 'createdAt'
+      }));
       console.log('Fetched donation data:', recentDonations);
-      setDonationData(recentDonations);
+      setDonationData(formattedDonations);
       setTotalDonations(totalDonations);
       setTotalQuantity(totalQuantity);
     } catch (error) {
