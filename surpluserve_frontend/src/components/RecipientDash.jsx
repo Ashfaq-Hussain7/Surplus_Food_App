@@ -32,15 +32,31 @@ const RecipientDashboard = () => {
         staggerChildren: 0.1
       }
     }
+
+// import React, { useState } from 'react';
+// import { useNavigate } from 'react-router-dom';
+// import Modal from 'react-modal';
+// import '../styles/RecipientDash.css';
+
+// Modal.setAppElement('#root');
+
+// const RecipientDashboard = () => {
+//   const [isModalOpen, setIsModalOpen] = useState(false);
+//   const [newLocation, setNewLocation] = useState('');
+//   const navigate = useNavigate(); // Initialize navigate
+
+//   const openModal = () => setIsModalOpen(true);
+//   const closeModal = () => setIsModalOpen(false);
+
+//   const handleLocationChange = (event) => {
+//     setNewLocation(event.target.value);
   };
 
-  const itemVariants = {
-    hidden: { y: 20, opacity: 0 },
-    visible: {
-      y: 0,
-      opacity: 1
-    }
+  const saveLocation = () => {
+    console.log("New location saved:", newLocation);
+    closeModal();
   };
+
 
   // Fetch available donations from the backend
   useEffect(() => {
@@ -49,42 +65,20 @@ const RecipientDashboard = () => {
   // Redirect function
   const handleReserve = (donationId) => {
     navigate(`/reservation`, {state: {donationId}}); // Navigate to /reservation on click
+//   // Function to handle reservation navigation
+//   const handleReserve = (reservationId) => {
+//     navigate(`/reservation/${reservationId}`); // Navigate with reservation ID
+
   };
 
   return (
-    <div className="p-6 max-w-7xl mx-auto">
-      <motion.div
-        variants={containerVariants}
-        initial="hidden"
-        animate="visible"
-        className="space-y-6"
-      >
-        {/* Header */}
-        <div className="flex flex-col md:flex-row md:items-center md:justify-between space-y-4 md:space-y-0">
-          <motion.h1 
-            variants={itemVariants}
-            className="text-3xl font-bold text-gray-900"
-          >
-            Available Donations
-          </motion.h1>
-          <motion.div 
-            variants={itemVariants}
-            className="flex space-x-2"
-          >
-            <div className="relative flex-1 md:w-64">
-              <Search className="absolute left-2 top-2.5 h-4 w-4 text-gray-400" />
-              <input 
-                type="text" 
-                placeholder="Search donations..." 
-                className="pl-8 py-2 w-full border rounded-md focus:ring-2 focus:ring-blue-500" 
-              />
-            </div>
-            <button className="flex items-center bg-gray-200 text-gray-800 px-4 py-2 rounded-md hover:bg-gray-300">
-              <MapPin className="h-4 w-4 mr-2" />
-              Change Location
-            </button>
-          </motion.div>
+    <div className="recipient-dashboard">
+      <div className="dashboard-header">
+        <div className="header-content">
+          <h1>Your Dashboard</h1>
         </div>
+      </div>
+
 
         {/* Stats */}
         <motion.div 
@@ -99,31 +93,32 @@ const RecipientDashboard = () => {
               </div>
               <div className="text-2xl font-bold">{availableDonations.length}</div>
               <p className="text-xs text-gray-500">In your area</p>
-            </div>
-          </motion.div>
 
-          <motion.div variants={itemVariants}>
-            <div className="bg-white p-4 rounded-lg shadow-md">
-              <div className="flex justify-between items-center">
-                <h3 className="text-sm font-medium">Next Available Pickup</h3>
-                <Clock className="h-4 w-4 text-gray-400" />
-              </div>
-              <div className="text-2xl font-bold">30m</div>
-              <p className="text-xs text-gray-500">Within 2km radius</p>
-            </div>
-          </motion.div>
+//       <div className="dashboard-container">
+//         <div className="dashboard-content">
+//           <div className="search-section">
+//             <div className="search-container">
+//               <span className="search-icon" role="img" aria-label="search">🔍</span>
+//               <input type="text" placeholder="Search donations..." />
 
-          <motion.div variants={itemVariants}>
-            <div className="bg-white p-4 rounded-lg shadow-md">
-              <div className="flex justify-between items-center">
-                <h3 className="text-sm font-medium">Scheduled Pickups</h3>
-                <Calendar className="h-4 w-4 text-gray-400" />
-              </div>
-              <div className="text-2xl font-bold">3</div>
-              <p className="text-xs text-gray-500">For this week</p>
             </div>
-          </motion.div>
-        </motion.div>
+            <button className="location-button" onClick={openModal}>
+              <span className="location-icon" role="img" aria-label="location">📍</span>
+              Change Location
+            </button>
+          </div>
+
+          <div className="stats-grid">
+            <div className="stat-box">
+              <div className="stat-header">
+                <h3>Donations</h3>
+                <span className="stat-icon" role="img" aria-label="donations">📦</span>
+              </div>
+              <p className="stat-value">150</p>
+              <p className="stat-subtitle">Total Donations</p>
+            </div>
+          </div>
+
 
         {/* Available Donations List */}
         <motion.div variants={itemVariants} className="space-y-4">
@@ -145,12 +140,44 @@ const RecipientDashboard = () => {
                 </div>
               </div>
               <button onClick={() => handleReserve(donation._id)} className="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600">
+//           <div className="donations-list">
+//             <h2>Recent Donations</h2>
+//             <div className="donation-card">
+//               <div className="donation-content">
+//                 <h3>Food Donation from ABC Restaurant</h3>
+//                 <p className="items-text">Items: Sandwiches, Fruits</p>
+//                 <div className="donation-meta">
+//                   <span className="meta-icon" role="img" aria-label="location">📍</span>
+//                   1234 Food Lane, City
+//                 </div>
+//               </div>
+//               <button className="reserve-button" onClick={() => handleReserve('123')}>
                 Reserve
               </button>
             </div>
-          ))}
-        </motion.div>
-      </motion.div>
+          </div>
+        </div>
+      </div>
+
+      {/* Change Location Modal */}
+      <Modal
+        isOpen={isModalOpen}
+        onRequestClose={closeModal}
+        contentLabel="Change Location"
+        className="modal"
+        overlayClassName="overlay"
+      >
+        <h2>Change Your Location</h2>
+        <input
+          type="text"
+          value={newLocation}
+          onChange={handleLocationChange}
+          placeholder="Enter new location"
+          className="location-input"
+        />
+        <button onClick={saveLocation} className="save-button">Save</button>
+        <button onClick={closeModal} className="cancel-button">Cancel</button>
+      </Modal>
     </div>
   );
 };

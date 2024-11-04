@@ -2,13 +2,25 @@
 .container {
   min-height: 100vh;
   background-color: #f9fafb;
-  padding: 1.5rem;
+  padding: 2rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 .content {
-  max-width: 48rem;
-  margin: 0 auto;
+  width: 100%;
+  max-width: 800px;
+  background-color: white;
+  border-radius: 16px;
+  padding: 2rem;
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
   animation: fadeIn 0.5s ease-out;
+  transition: transform 0.3s;
+}
+
+.content:hover {
+  transform: translateY(-4px);
 }
 
 /* Header Styles */
@@ -19,7 +31,7 @@
 }
 
 .title {
-  font-size: 2rem;
+  font-size: 2.5rem;
   font-weight: 700;
   color: #1f2937;
   margin-bottom: 0.5rem;
@@ -27,30 +39,24 @@
 
 .reservationId {
   color: #6b7280;
-  font-size: 0.975rem;
+  font-size: 1rem;
 }
 
 /* Card Styles */
 .card {
   background-color: white;
-  border-radius: 1rem;
+  border-radius: 12px;
   padding: 1.5rem;
   margin-bottom: 1.5rem;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-  animation: slideUp 0.5s ease-out;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  animation: slideUp 0.6s ease-out;
 }
 
 .cardTitle {
-  font-size: 1.125rem;
+  font-size: 1.25rem;
   font-weight: 600;
   color: #374151;
   margin-bottom: 1rem;
-}
-
-.cardHeader {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
 }
 
 /* Status Badge */
@@ -58,9 +64,10 @@
   display: flex;
   align-items: center;
   padding: 0.5rem 1rem;
-  border-radius: 9999px;
+  border-radius: 20px;
   font-size: 0.875rem;
   font-weight: 500;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
 }
 
 .statusConfirmed {
@@ -74,8 +81,8 @@
 }
 
 .statusIcon {
-  width: 1rem;
-  height: 1rem;
+  width: 1.2rem;
+  height: 1.2rem;
   margin-right: 0.25rem;
 }
 
@@ -107,8 +114,8 @@
 .instructions {
   background-color: #f3f4f6;
   padding: 1rem;
-  border-radius: 0.5rem;
-  margin-top: 0.5rem;
+  border-radius: 8px;
+  color: #374151;
 }
 
 /* Pickup Details */
@@ -121,8 +128,9 @@
 .pickupWindow {
   background-color: #eff6ff;
   padding: 1rem;
-  border-radius: 0.5rem;
+  border-radius: 8px;
   color: #1e40af;
+  font-weight: 500;
 }
 
 /* Items List */
@@ -136,6 +144,7 @@
   justify-content: space-between;
   padding: 0.75rem 0;
   border-bottom: 1px solid #f3f4f6;
+  color: #374151;
 }
 
 .itemRow:last-child {
@@ -144,6 +153,7 @@
 
 .itemName {
   color: #1f2937;
+  font-weight: 500;
 }
 
 .itemQuantity {
@@ -162,9 +172,10 @@
 .actions button {
   flex: 1;
   padding: 0.75rem 1.5rem;
-  border-radius: 0.5rem;
-  font-weight: 500;
-  transition: all 0.2s ease;
+  border-radius: 8px;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  font-size: 1rem;
 }
 
 .cancelButton {
@@ -175,6 +186,7 @@
 
 .cancelButton:hover {
   background-color: #fef2f2;
+  transform: scale(1.05);
 }
 
 .confirmButton {
@@ -185,6 +197,7 @@
 
 .confirmButton:hover {
   background-color: #1d4ed8;
+  transform: scale(1.05);
 }
 
 /* Animations */
@@ -230,6 +243,6 @@
   }
   
   .title {
-    font-size: 1.5rem;
+    font-size: 2rem;
   }
 }
