@@ -1,9 +1,29 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { ShoppingBag, Clock, MapPin, Calendar, Search } from 'lucide-react';
+import axios from 'axios';
 import '../styles/RecipientDash.css'
 
 const RecipientDashboard = () => {
+  const [availableDonations, setAvailableDonations] = useState([]);
+  const navigate = useNavigate();
+  
+  const fetchDonations = async () => {
+    try {
+      const token = localStorage.getItem('token');
+      const response = await axios.get('/api/recipient/dashboard', {
+        headers: {
+          'x-auth-token': token, // Add the token in the Authorization header
+        },
+      });
+      console.log(response.data.availableDonations);
+      setAvailableDonations(response.data.availableDonations);
+    } catch (error) {
+      console.error("Error fetching available donations: ", error);
+    }
+  };
+
   const containerVariants = {
     hidden: { opacity: 0 },
     visible: {
@@ -22,29 +42,14 @@ const RecipientDashboard = () => {
     }
   };
 
-  const availableDonations = [
-    {
-      id: 1,
-      donor: "Fresh Foods Market",
-      items: "Fresh vegetables, bread",
-      distance: "0.8 km",
-      pickup: "Today, 5-6 PM"
-    },
-    {
-      id: 2,
-      donor: "Local Bakery",
-      items: "Assorted pastries",
-      distance: "1.2 km",
-      pickup: "Tomorrow, 9-10 AM"
-    },
-    {
-      id: 3,
-      donor: "Green Grocers",
-      items: "Mixed fruits, dairy",
-      distance: "2.1 km",
-      pickup: "Today, 7-8 PM"
-    }
-  ];
+  // Fetch available donations from the backend
+  useEffect(() => {
+    fetchDonations();
+  }, []);
+  // Redirect function
+  const handleReserve = (donationId) => {
+    navigate(`/reservation`, {state: {donationId}}); // Navigate to /reservation on click
+  };
 
   return (
     <div className="p-6 max-w-7xl mx-auto">
@@ -92,7 +97,7 @@ const RecipientDashboard = () => {
                 <h3 className="text-sm font-medium">Available Now</h3>
                 <ShoppingBag className="h-4 w-4 text-gray-400" />
               </div>
-              <div className="text-2xl font-bold">12</div>
+              <div className="text-2xl font-bold">{availableDonations.length}</div>
               <p className="text-xs text-gray-500">In your area</p>
             </div>
           </motion.div>
@@ -124,22 +129,22 @@ const RecipientDashboard = () => {
         <motion.div variants={itemVariants} className="space-y-4">
           <h2 className="text-xl font-semibold">Nearby Donations</h2>
           {availableDonations.map((donation) => (
-            <div key={donation.id} className="bg-white p-4 rounded-lg shadow-md flex justify-between items-center">
+            <div key={donation._id} className="bg-white p-4 rounded-lg shadow-md flex justify-between items-center">
               <div className="space-y-1">
-                <h3 className="font-medium">{donation.donor}</h3>
-                <p className="text-sm text-gray-500">{donation.items}</p>
+                <h3 className="font-medium">{donation.pickupLocation}</h3>
+                <p className="text-sm text-gray-500">{donation.itemDetails}</p>
                 <div className="flex items-center space-x-4 text-sm text-gray-500">
                   <span className="flex items-center">
                     <MapPin className="h-4 w-4 mr-1" />
-                    {donation.distance}
+                    {donation.foodType}
                   </span>
                   <span className="flex items-center">
                     <Clock className="h-4 w-4 mr-1" />
-                    {donation.pickup}
+                    {donation.quantity} servings
                   </span>
                 </div>
               </div>
-              <button className="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600">
+              <button onClick={() => handleReserve(donation._id)} className="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600">
                 Reserve
               </button>
             </div>

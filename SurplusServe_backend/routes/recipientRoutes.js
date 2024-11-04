@@ -2,7 +2,7 @@ import express from "express";
 import { Router } from "express";
 import auth from "../middleware/auth.js";
 import Recipient from "../models/Recipient.js";
-import { registerRecipient, loginRecipient, getDashboard, claimDonation, searchDonations} from "../controllers/recipientController.js";
+import { registerRecipient, loginRecipient, getDashboard, claimDonation, searchDonations, getDonationById} from "../controllers/recipientController.js";
 
 const router = Router();
 
@@ -24,6 +24,7 @@ router.get('/profile', auth, async (req, res) => {
 router.get('/dashboard', auth, getDashboard);
 router.post('/claim/:id', auth, claimDonation);
 router.post('/search', auth, searchDonations);
+router.get('/dashboard/:id', auth, getDonationById);
 
 
 export default router;
